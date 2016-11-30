@@ -9,6 +9,7 @@
 #include <vector>
 #include <random>
 #include <time.h>
+#include <algorithm>
 #include <stdlib.h>
 
 #define getCHandle GetStdHandle(STD_OUTPUT_HANDLE);
@@ -16,7 +17,7 @@
 
 using namespace std;
 
-enum class Move {Up,Down};
+enum class Move {Up,Down,Left};
 
 void KeyHandler();
 
@@ -31,7 +32,8 @@ struct Wall {
 };
 
 Player player;
-size_t posYLimit;
+size_t ConsoleHeight;
+size_t ConsoleLenght;
 vector<Wall> walls = vector<Wall>();
 
 class ConsoleHandle {
@@ -71,6 +73,20 @@ public:
 		ConsoleHandle::drawPlayerAtPos(player.posX, player.posY, '>');
 	}
 
+	static void RedrawWalls() {
+		if (walls.size() == 0)
+			return;
+
+		for (int i = 0; i < walls.size(); i++) {
+			ConsoleHandle::drawWall(walls[i].PosX, walls[i].PosY, walls[i].height, '#');
+		}
+	}
+
+	static void TotalRedraw() {
+		RedrawPlayer();
+		RedrawWalls();
+	}
+
 	static void MovePlayer(Move move) {
 		switch (move) {
 			case Move::Up:
@@ -79,22 +95,49 @@ public:
 				}
 				break;
 			case Move::Down:
-				if (player.posY < posYLimit) {
+				if (player.posY < ConsoleHeight) {
 					player.posY++;
 				}
+				break;
+
+			case Move::Left:
+				IncrementWalls();
 				break;
 		}
 	}
 
-	void IncrementWalls() {
+	static void CheckPlayerAndWalls() {
+		//TODO Check Diffrent Statues and positions for the player and walls to see if it has hit the player
 
+	}
+
+	static void IncrementWalls() {
+		if (walls.size() == 0)
+			return;
+
+		for (int i = 0; i < walls.size(); i++) {
+			if (walls[i].PosX == 0)
+			{
+				walls.erase(walls.begin() + i);
+				return;
+			}
+
+			walls[i].PosX--;
+		}
 	}
 };
 
 class Generator {
 public:
 	static Wall CreateWall() {
-		//TODO Make Generation Method
+		srand(time(NULL));
+		size_t wallHeight = rand() % 20 + 1;
+		size_t wallPosY = rand() % ConsoleHeight;
+		Wall wall;
+		wall.height = wallHeight;
+		wall.PosX = ConsoleLenght;
+		wall.PosY = wallPosY;
+		return wall;
 	}
 };
 
@@ -103,12 +146,16 @@ void KeyHandler() {
 		if (GetAsyncKeyState(VK_UP)) {
 			//TODO make a "re draw" and move pos
 			PositionHandle::MovePlayer(Move::Up);
-			PositionHandle::RedrawPlayer();
+			PositionHandle::TotalRedraw();
 		}
 		else if (GetAsyncKeyState(VK_DOWN)) {
 			//TODO make a "re draw" and move pos
 			PositionHandle::MovePlayer(Move::Down);
-			PositionHandle::RedrawPlayer();
+			PositionHandle::TotalRedraw();
+		}
+		else if (GetAsyncKeyState(VK_LEFT)) {
+			PositionHandle::MovePlayer(Move::Left);
+			PositionHandle::TotalRedraw();
 		}
 		Sleep(17);
 	}
@@ -128,9 +175,18 @@ int main()
 
 	GetConsoleScreenBufferInfo(console, &csbi);
 
-	posYLimit = csbi.srWindow.Bottom;
+	ConsoleHeight = csbi.srWindow.Bottom;
+	ConsoleLenght = csbi.srWindow.Right;
 
+	Wall wall = Generator::CreateWall();
+
+	walls.push_back(wall);
+
+	PositionHandle::TotalRedraw();
+	
 	PositionHandle::CreatePlayer(csbi.srWindow.Bottom / 2);
+
+
 
 	//ConsoleHandle::drawWall(csbi.srWindow.Right, csbi.srWindow.Bottom - 5, 2, '#');
 
