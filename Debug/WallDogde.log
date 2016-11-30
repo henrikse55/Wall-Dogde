@@ -1,5 +1,4 @@
 ﻿  WallDogde.cpp
-c:\users\henri\documents\visual studio 15\projects\walldogde\walldogde\walldogde.cpp(63): warning C4267: 'argument': conversion from 'size_t' to 'short', possible loss of data
-c:\users\henri\documents\visual studio 15\projects\walldogde\walldogde\walldogde.cpp(71): warning C4267: 'argument': conversion from 'size_t' to 'short', possible loss of data
+c:\users\henri\documents\visual studio 15\projects\walldogde\walldogde\walldogde.cpp(82): warning C4018: '<': signed/unsigned mismatch
   WallDogde.vcxproj -> c:\users\henri\documents\visual studio 15\Projects\WallDogde\Debug\WallDogde.exe
   WallDogde.vcxproj -> c:\users\henri\documents\visual studio 15\Projects\WallDogde\Debug\WallDogde.pdb (Partial PDB)

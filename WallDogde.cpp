@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <future>
+#include <thread>
 #include <vector>
 #include <random>
 #include <time.h>
@@ -20,12 +21,12 @@ enum class Move {Up,Down};
 void KeyHandler();
 
 struct Player {
-	size_t posX, posY;
+	short posX, posY;
 	size_t Score;
 };
 
 struct Wall {
-	size_t PosX, PosY;
+	short PosX, PosY;
 	size_t height;
 };
 
@@ -73,11 +74,8 @@ public:
 	static void MovePlayer(Move move) {
 		switch (move) {
 			case Move::Up:
-				if (player.posY != 0) {
+				if (player.posY > 0) {
 					player.posY--;
-				}
-				else {
-					player.posY = 0;
 				}
 				break;
 			case Move::Down:
