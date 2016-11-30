@@ -62,14 +62,14 @@ public:
 		player.posX = 0;
 		player.posY = posY;
 		
-		ConsoleHandle::drawPlayerAtPos(player.posX, player.posY, '>');
+		TotalRedraw();
+		//ConsoleHandle::drawPlayerAtPos(player.posX, player.posY, '>');
 
 		async(KeyHandler);
 
 	}
 
 	static void RedrawPlayer() {
-		CLEAR_CONSOLE;
 		ConsoleHandle::drawPlayerAtPos(player.posX, player.posY, '>');
 	}
 
@@ -83,6 +83,7 @@ public:
 	}
 
 	static void TotalRedraw() {
+		CLEAR_CONSOLE;
 		RedrawPlayer();
 		RedrawWalls();
 	}
@@ -153,7 +154,7 @@ void KeyHandler() {
 			PositionHandle::MovePlayer(Move::Down);
 			PositionHandle::TotalRedraw();
 		}
-		else if (GetAsyncKeyState(VK_LEFT)) {
+		if (GetAsyncKeyState(VK_LEFT)) {
 			PositionHandle::MovePlayer(Move::Left);
 			PositionHandle::TotalRedraw();
 		}
@@ -182,8 +183,6 @@ int main()
 
 	walls.push_back(wall);
 
-	PositionHandle::TotalRedraw();
-	
 	PositionHandle::CreatePlayer(csbi.srWindow.Bottom / 2);
 
 
