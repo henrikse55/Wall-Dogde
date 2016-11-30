@@ -4,7 +4,7 @@
 #pragma comment (lib, "user32.lib")
 
 #include <iostream>
-#include <thread>
+#include <future>
 #include <vector>
 #include <random>
 #include <time.h>
@@ -14,6 +14,10 @@
 #define CLEAR_CONSOLE system("cls");
 
 using namespace std;
+
+enum class Move {Up,Down};
+
+void KeyHandler();
 
 struct Player {
 	size_t posX, posY;
@@ -26,6 +30,7 @@ struct Wall {
 };
 
 Player player;
+size_t posYLimit;
 vector<Wall> walls = vector<Wall>();
 
 class ConsoleHandle {
@@ -53,9 +58,34 @@ public:
 		player.Score = 0;
 		player.posX = 0;
 		player.posY = posY;
-
-		//TODO Start Movement Threads
+		
 		ConsoleHandle::drawPlayerAtPos(player.posX, player.posY, '>');
+
+		async(KeyHandler);
+
+	}
+
+	static void RedrawPlayer() {
+		CLEAR_CONSOLE;
+		ConsoleHandle::drawPlayerAtPos(player.posX, player.posY, '>');
+	}
+
+	static void MovePlayer(Move move) {
+		switch (move) {
+			case Move::Up:
+				if (player.posY != 0) {
+					player.posY--;
+				}
+				else {
+					player.posY = 0;
+				}
+				break;
+			case Move::Down:
+				if (player.posY < posYLimit) {
+					player.posY++;
+				}
+				break;
+		}
 	}
 
 	void IncrementWalls() {
@@ -66,9 +96,25 @@ public:
 class Generator {
 public:
 	static Wall CreateWall() {
-
+		//TODO Make Generation Method
 	}
 };
+
+void KeyHandler() {
+	while (1) {
+		if (GetAsyncKeyState(VK_UP)) {
+			//TODO make a "re draw" and move pos
+			PositionHandle::MovePlayer(Move::Up);
+			PositionHandle::RedrawPlayer();
+		}
+		else if (GetAsyncKeyState(VK_DOWN)) {
+			//TODO make a "re draw" and move pos
+			PositionHandle::MovePlayer(Move::Down);
+			PositionHandle::RedrawPlayer();
+		}
+		Sleep(17);
+	}
+}
 
 int main()
 {
@@ -84,10 +130,11 @@ int main()
 
 	GetConsoleScreenBufferInfo(console, &csbi);
 
-	PositionHandle::CreatePlayer(csbi.srWindow.Bottom - 5);
+	posYLimit = csbi.srWindow.Bottom;
 
-	ConsoleHandle::drawWall(csbi.srWindow.Right, csbi.srWindow.Bottom - 5, 2, '#');
+	PositionHandle::CreatePlayer(csbi.srWindow.Bottom / 2);
 
-	cin.ignore();
+	//ConsoleHandle::drawWall(csbi.srWindow.Right, csbi.srWindow.Bottom - 5, 2, '#');
+
     return 0;
 }
