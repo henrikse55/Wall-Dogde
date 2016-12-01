@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <string>
 
-#define getCHandle GetStdHandle(STD_OUTPUT_HANDLE);
+#define GETCHANDLE GetStdHandle(STD_OUTPUT_HANDLE);
 #define CLEAR_CONSOLE ConsoleHandle::cls();
 
 using namespace std;
