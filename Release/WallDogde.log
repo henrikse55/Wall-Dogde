@@ -1,5 +1,2 @@
-﻿  WallDogde.cpp
-WallDogde.cpp(63): warning C4267: 'argument': conversion from 'size_t' to 'short', possible loss of data
-WallDogde.cpp(71): warning C4267: 'argument': conversion from 'size_t' to 'short', possible loss of data
-  WallDogde.vcxproj -> c:\users\henri\documents\visual studio 15\Projects\WallDogde\Release\WallDogde.exe
-  WallDogde.vcxproj -> c:\users\henri\documents\visual studio 15\Projects\WallDogde\Release\WallDogde.pdb (Full PDB)
+﻿  WallDogde.vcxproj -> C:\Users\henri\documents\visual studio 15\Projects\WallDogde\Release\WallDogde.exe
+  WallDogde.vcxproj -> C:\Users\henri\documents\visual studio 15\Projects\WallDogde\Release\WallDogde.pdb (Full PDB)

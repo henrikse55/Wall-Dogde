@@ -11,15 +11,14 @@
 #include <time.h>
 #include <algorithm>
 #include <stdlib.h>
+#include <string>
 
 #define getCHandle GetStdHandle(STD_OUTPUT_HANDLE);
-#define CLEAR_CONSOLE system("cls");
+#define CLEAR_CONSOLE ConsoleHandle::cls();
 
 using namespace std;
 
 enum class Move {Up,Down,Left};
-
-void KeyHandler();
 
 struct Player {
 	short posX, posY;
@@ -31,27 +30,101 @@ struct Wall {
 	size_t height;
 };
 
+void KeyHandler();
+
 Player player;
 size_t ConsoleHeight;
 size_t ConsoleLenght;
+short overflowY = 0;
 vector<Wall> walls = vector<Wall>();
 
 class ConsoleHandle {
 public:
-	 static void drawPlayerAtPos(short x, short y, char player) {
-		 HANDLE console = getCHandle;
-		 COORD pos = { x,y };
-		 SetConsoleCursorPosition(console, pos);
-		 cout << player;
+
+	static void ClearOldLines(short x) {
+		cout.flush();
+		HANDLE console = getCHandle;
+		for (int i = 0; i < ConsoleHeight; i++) {
+			COORD pos{ x,i };
+			SetConsoleCursorPosition(console, pos);
+			cout << ' ';
+			cout.flush();
+		}
 	}
 
-	 static void drawWall(short x, short y, short height, char wallTexture) {
+	 static void drawPlayerAtPos(short x, short y, char PlayerChar) {
+		 cout.flush();
 		 HANDLE console = getCHandle;
-		 for (short i = height; i > 0; i--) {
-			 COORD pos = { x,(y - i)};
+
+		 COORD pos = { x, player.posY -1};
+		 SetConsoleCursorPosition(console, pos);
+		 cout << ' ';
+		 cout.flush();
+
+		 pos = { x, player.posY + 1 };
+		 if (!(pos.Y > ConsoleHeight)) {
+			SetConsoleCursorPosition(console, pos);
+			cout << ' ';
+			cout.flush();
+		 }
+
+		 pos = { x,y };
+		 SetConsoleCursorPosition(console, pos);
+		 cout << PlayerChar;
+	}
+	 static void drawWall(short x, short y, short height, char wallTexture) {
+		 cout.flush();
+		 HANDLE console = getCHandle;
+		 for (short i = 0; i < height; i++) {
+			 COORD pos = { x,(y + i)};
+			 if (pos.Y > ConsoleHeight) {
+				 pos.Y = overflowY;
+				 overflowY++;
+			 }
+
 			 SetConsoleCursorPosition(console, pos);
 			 cout << wallTexture;
 		 }
+		 overflowY = 0;
+	}
+
+	 static void drawText(short x, short y, string text) {
+		 cout.flush();
+		 HANDLE console = getCHandle;
+		 COORD pos{ x,y };
+		 SetConsoleCursorPosition(console, pos);
+		 cout << text;
+	 }
+
+	 static void cls() {
+		 static const HANDLE hOut = getCHandle;
+		 CONSOLE_SCREEN_BUFFER_INFO csbi;
+		 COORD pos{ 0,0 };
+		 cout.flush();
+
+		 if (!GetConsoleScreenBufferInfo(hOut, &csbi)) {
+			 abort();
+		 }
+		 DWORD lenght = csbi.dwSize.X * csbi.dwSize.Y;
+		 DWORD written;
+
+		 FillConsoleOutputCharacter(hOut, TEXT(' '),lenght, pos, &written);
+		 FillConsoleOutputAttribute(hOut, csbi.wAttributes, lenght, pos, &written);
+		 SetConsoleCursorPosition(hOut, pos);
+	 }
+};
+
+class Generator {
+public:
+	static Wall CreateWall() {
+		srand(time(NULL));
+		size_t wallHeight = rand() % 5 + (ConsoleHeight - 5);
+		size_t wallPosY = rand() % ConsoleHeight;
+		Wall wall;
+		wall.height = wallHeight;
+		wall.PosX = ConsoleLenght;
+		wall.PosY = wallPosY;
+		return wall;
 	}
 };
 
@@ -62,30 +135,24 @@ public:
 		player.posX = 0;
 		player.posY = posY;
 		
-		TotalRedraw();
+		reDrawPlayer();
 		//ConsoleHandle::drawPlayerAtPos(player.posX, player.posY, '>');
 
 		async(KeyHandler);
 
 	}
 
-	static void RedrawPlayer() {
+	static void reDrawPlayer() {
+		//CLEAR_CONSOLE;
 		ConsoleHandle::drawPlayerAtPos(player.posX, player.posY, '>');
-	}
-
-	static void RedrawWalls() {
-		if (walls.size() == 0)
-			return;
-
-		for (int i = 0; i < walls.size(); i++) {
-			ConsoleHandle::drawWall(walls[i].PosX, walls[i].PosY, walls[i].height, '#');
-		}
 	}
 
 	static void TotalRedraw() {
 		CLEAR_CONSOLE;
-		RedrawPlayer();
-		RedrawWalls();
+		reDrawPlayer();
+		for (int i = 0; i < walls.size(); i++) {
+			ConsoleHandle::drawWall(walls[i].PosX, walls[i].PosY, walls[i].height, '#');
+		}
 	}
 
 	static void MovePlayer(Move move) {
@@ -107,9 +174,48 @@ public:
 		}
 	}
 
-	static void CheckPlayerAndWalls() {
-		//TODO Check Diffrent Statues and positions for the player and walls to see if it has hit the player
+	static bool IsPlayerCollided() {
+		for (int i = 0; i < walls.size(); i++) {
+			if (walls[i].PosX == 0) {
+				for (int j = 0; j < walls[i].height; j++) {
+					short TotalY = walls[i].PosY + j;
+					if (TotalY > ConsoleHeight) {
+						if (player.posY == overflowY && player.posX == walls[i].PosX) {
+							return true;
+						}
+						else {
+							overflowY++;
+						}
+					}
+					else if (player.posY == TotalY && player.posX == walls[i].PosX) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
 
+	static void Ticker() {
+		size_t SpawnTimer = 0;
+		while (1) {
+			IncrementWalls();
+			future<bool> isPlayerHit = async(IsPlayerCollided);
+			if (isPlayerHit.get()) {
+				CLEAR_CONSOLE;
+				ConsoleHandle::drawText(ConsoleLenght / 2 - 5, ConsoleHeight / 2,  "Please go kill yourself now! Score: " + to_string(player.Score));
+				return;
+			}
+			TotalRedraw();
+			if (SpawnTimer > 9) {
+				Wall newWall = Generator::CreateWall();
+				walls.push_back(newWall);
+				SpawnTimer = 0;
+			}
+			size_t speed = 200 - (player.Score);
+			Sleep(speed > 50 ? speed : 50);
+			SpawnTimer++;
+		}
 	}
 
 	static void IncrementWalls() {
@@ -117,48 +223,33 @@ public:
 			return;
 
 		for (int i = 0; i < walls.size(); i++) {
+			ConsoleHandle::ClearOldLines(walls[i].PosX);
 			if (walls[i].PosX == 0)
 			{
 				walls.erase(walls.begin() + i);
+				player.Score++;
 				return;
 			}
-
 			walls[i].PosX--;
 		}
-	}
-};
-
-class Generator {
-public:
-	static Wall CreateWall() {
-		srand(time(NULL));
-		size_t wallHeight = rand() % 20 + 1;
-		size_t wallPosY = rand() % ConsoleHeight;
-		Wall wall;
-		wall.height = wallHeight;
-		wall.PosX = ConsoleLenght;
-		wall.PosY = wallPosY;
-		return wall;
 	}
 };
 
 void KeyHandler() {
 	while (1) {
 		if (GetAsyncKeyState(VK_UP)) {
-			//TODO make a "re draw" and move pos
 			PositionHandle::MovePlayer(Move::Up);
-			PositionHandle::TotalRedraw();
+			PositionHandle::reDrawPlayer();
 		}
 		else if (GetAsyncKeyState(VK_DOWN)) {
-			//TODO make a "re draw" and move pos
 			PositionHandle::MovePlayer(Move::Down);
-			PositionHandle::TotalRedraw();
+			PositionHandle::reDrawPlayer();
 		}
 		if (GetAsyncKeyState(VK_LEFT)) {
 			PositionHandle::MovePlayer(Move::Left);
-			PositionHandle::TotalRedraw();
+			//PositionHandle::TotalRedraw();
 		}
-		Sleep(17);
+		Sleep(18);
 	}
 }
 
@@ -183,9 +274,9 @@ int main()
 
 	walls.push_back(wall);
 
+	thread ticker(PositionHandle::Ticker);
+
 	PositionHandle::CreatePlayer(csbi.srWindow.Bottom / 2);
-
-
 
 	//ConsoleHandle::drawWall(csbi.srWindow.Right, csbi.srWindow.Bottom - 5, 2, '#');
 

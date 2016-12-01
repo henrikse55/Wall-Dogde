@@ -1,10 +1,17 @@
 ﻿  WallDogde.cpp
-c:\users\henri\documents\visual studio 15\projects\walldogde\walldogde\walldogde.cpp(80): warning C4018: '<': signed/unsigned mismatch
-c:\users\henri\documents\visual studio 15\projects\walldogde\walldogde\walldogde.cpp(81): warning C4267: 'argument': conversion from 'size_t' to 'short', possible loss of data
-c:\users\henri\documents\visual studio 15\projects\walldogde\walldogde\walldogde.cpp(99): warning C4018: '<': signed/unsigned mismatch
-c:\users\henri\documents\visual studio 15\projects\walldogde\walldogde\walldogde.cpp(119): warning C4018: '<': signed/unsigned mismatch
-c:\users\henri\documents\visual studio 15\projects\walldogde\walldogde\walldogde.cpp(134): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-c:\users\henri\documents\visual studio 15\projects\walldogde\walldogde\walldogde.cpp(139): warning C4267: '=': conversion from 'size_t' to 'short', possible loss of data
-c:\users\henri\documents\visual studio 15\projects\walldogde\walldogde\walldogde.cpp(140): warning C4267: '=': conversion from 'size_t' to 'short', possible loss of data
-  WallDogde.vcxproj -> c:\users\henri\documents\visual studio 15\Projects\WallDogde\Debug\WallDogde.exe
-  WallDogde.vcxproj -> c:\users\henri\documents\visual studio 15\Projects\WallDogde\Debug\WallDogde.pdb (Partial PDB)
+c:\users\henri\documents\visual studio 15\projects\walldogde\walldogde\walldogde.cpp(47): warning C4018: '<': signed/unsigned mismatch
+c:\users\henri\documents\visual studio 15\projects\walldogde\walldogde\walldogde.cpp(48): warning C4838: conversion from 'int' to 'SHORT' requires a narrowing conversion
+c:\users\henri\documents\visual studio 15\projects\walldogde\walldogde\walldogde.cpp(78): warning C4018: '>': signed/unsigned mismatch
+c:\users\henri\documents\visual studio 15\projects\walldogde\walldogde\walldogde.cpp(118): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+c:\users\henri\documents\visual studio 15\projects\walldogde\walldogde\walldogde.cpp(123): warning C4267: '=': conversion from 'size_t' to 'short', possible loss of data
+c:\users\henri\documents\visual studio 15\projects\walldogde\walldogde\walldogde.cpp(124): warning C4267: '=': conversion from 'size_t' to 'short', possible loss of data
+c:\users\henri\documents\visual studio 15\projects\walldogde\walldogde\walldogde.cpp(151): warning C4018: '<': signed/unsigned mismatch
+c:\users\henri\documents\visual studio 15\projects\walldogde\walldogde\walldogde.cpp(152): warning C4267: 'argument': conversion from 'size_t' to 'short', possible loss of data
+c:\users\henri\documents\visual studio 15\projects\walldogde\walldogde\walldogde.cpp(164): warning C4018: '<': signed/unsigned mismatch
+c:\users\henri\documents\visual studio 15\projects\walldogde\walldogde\walldogde.cpp(176): warning C4018: '<': signed/unsigned mismatch
+c:\users\henri\documents\visual studio 15\projects\walldogde\walldogde\walldogde.cpp(178): warning C4018: '<': signed/unsigned mismatch
+c:\users\henri\documents\visual studio 15\projects\walldogde\walldogde\walldogde.cpp(180): warning C4018: '>': signed/unsigned mismatch
+c:\users\henri\documents\visual studio 15\projects\walldogde\walldogde\walldogde.cpp(204): warning C4267: 'argument': conversion from 'size_t' to 'short', possible loss of data
+c:\users\henri\documents\visual studio 15\projects\walldogde\walldogde\walldogde.cpp(223): warning C4018: '<': signed/unsigned mismatch
+  WallDogde.vcxproj -> C:\Users\henri\documents\visual studio 15\Projects\WallDogde\Debug\WallDogde.exe
+  WallDogde.vcxproj -> C:\Users\henri\documents\visual studio 15\Projects\WallDogde\Debug\WallDogde.pdb (Partial PDB)
